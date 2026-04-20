@@ -2,8 +2,8 @@ import express from "express";  // npm i express
 import cors    from "cors";     // npm i cors
 import {sumar, restar, dividir, multiplicar} from "./modules/matematica.js";
 import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./modules/omdb-wrapper.js";
-import alumnosArray from "./models/alumno.js";
-import buscarAlumno from "./models/alumno.js";
+import { findAlumno, alumnosArray, newAlumno} from './models/alumno.js'
+
 
 const app  = express();
 const port = 3000;               // http://localhost:3000
@@ -104,8 +104,15 @@ app.get('/alumnos', (req, res) => {
 
 app.get('/alumnos/:dni', (req, res) => {
     const dniBuscado = req.params.dni
-    const alumno = buscarAlumno(dniBuscado)
+    const alumno = findAlumno(dniBuscado)
      res.status(200).send(alumno)
+});
+
+app.get('/alumnos/:username/:dni/:edad', (req, res) => {
+  const username = req.params.username
+  const dni = req.params.dni
+  const edad = req.params.edad
+  newAlumno(username, dni, edad)
 });
 
 // === Arranca el servidor ===
