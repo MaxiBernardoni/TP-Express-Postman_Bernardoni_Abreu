@@ -42,13 +42,22 @@ app.get('/matematica/sumar', (req, res) => {
   const n2 = parseInt(req.query.n2);
   res.status(200).send(String(sumar(n1, n2)));
 });
-
 app.get('/matematica/restar', (req, res) => {
   const n1 = parseInt(req.query.n1);
   const n2 = parseInt(req.query.n2);
   res.status(200).send(String(restar(n1, n2)));
 });
 
+app.get('/matematica/dividir', (req, res) => {
+  const n1 = parseInt(req.query.n1);
+  const n2 = parseInt(req.query.n2);
+
+  if (n2 === 0) {
+    return res.status(400).send('El divisor no puede ser cero');
+  } 
+
+  return res.status(200).send(String(dividir(n1, n2)));
+});
 app.get('/matematica/multiplicar', (req, res) => {
   const n1 = parseInt(req.query.n1);
   const n2 = parseInt(req.query.n2);
@@ -108,14 +117,40 @@ app.get('/alumnos/:dni', (req, res) => {
      res.status(200).send(alumno)
 });
 
-app.get('/alumnos/:username/:dni/:edad', (req, res) => {
-  const username = req.params.username
-  const dni = req.params.dni
-  const edad = req.params.edad
-  newAlumno(username, dni, edad)
+app.get('/alumnos', (req, res) => {
+     res.status(200).send(alumnosArray)
 });
 
-// === Arranca el servidor ===
+app.get('/alumnos/:dni', (req, res) => {
+    const dniBuscado = req.params.dni
+    const alumno = findAlumno(dniBuscado)
+     res.status(200).send(alumno)
+});
+
+app.post('/alumnos', (req, res) => {
+  const { username, dni, edad } = req.body;
+
+  if (!username || !dni || !edad) {
+    return res.status(400).send('Faltan datos');
+  }
+
+  newAlumno(username, dni, edad);
+  return res.status(201).send('Alumno creado');
+});
+
+app.delete('/alumnos', (req, res) => {
+  const { dni } = req.body;
+
+  const index = alumnosArray.findIndex(a => a.dni === dni);
+
+  if (index < 0) {
+    return res.status(404).send('Alumno no encontrado');
+  }
+
+  alumnosArray.splice(index, 1);
+  return res.status(200).send('Alumno eliminado');
+});
+
 app.listen(port, () => {
   console.log(`Listening on http://localhost:${port}`);
 });
